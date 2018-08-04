@@ -1,0 +1,137 @@
+#include <Servo.h>
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+Servo fb;
+Servo rl;
+const int vP=3;
+bool v=false;
+void setup() {
+  // initialize serial:
+  Serial.begin(9600);
+  // reserve 200 bytes for the inputString:
+  inputString.reserve(100);
+  pinMode(vP,OUTPUT);
+  fb.attach(5);
+  rl.attach(6);
+  rl.write(90);
+  fb.write(90);
+  analogWrite(vP,0);
+  Serial.print("4d_chair@arduino-uno ~ $ ");
+}
+
+void loop() {
+  // print the string when a newline arrives:
+  if (stringComplete) { 
+    stringComplete = false;
+    if(inputString=="") Serial.print("\n");
+    Serial.print(inputString);
+    if(inputString=="f"){
+      fb.write(60);
+      Serial.print("\nFront\n");
+    }else if(inputString=="o"){
+      Serial.print("\n4d_chair_arduino\n");
+    }else if (inputString=="b"){
+      fb.write(120);
+      Serial.print("\nBack\n");
+    }
+    else if (inputString=="r")
+    {
+      rl.write(120);
+      Serial.print("\nRight\n");
+    }
+    else if (inputString=="l")
+    {
+      rl.write(60);
+      Serial.print("\nLeft\n");
+    }
+    else if (inputString=="c")
+    {
+      rl.write(90);
+      fb.write(90);
+      Serial.print("\nCenter\n");
+    }
+    else if (inputString=="rlc")
+    {
+      rl.write(90);
+      Serial.print("\nR+L Center\n");
+    }
+    else if (inputString=="fbc")
+    {
+      fb.write(90);
+      Serial.print("\nF+B Center\n");
+    }
+    else if (inputString=="fl")
+    {
+      rl.write(60);
+      fb.write(60);
+      Serial.print("\nFront Left\n");
+    }
+    else if (inputString=="fr")
+    {
+      rl.write(120);
+      fb.write(60);
+      Serial.print("\nFront Right\n");
+    }
+    else if (inputString=="bl")
+    {
+      rl.write(60);
+      fb.write(120);
+      Serial.print("\nBack Left\n");
+    }
+    else if (inputString=="br")
+    {
+      rl.write(120);
+      fb.write(120);
+      Serial.print("\nBack Right\n");
+    }
+    else if (inputString=="v")
+    {
+      if(!v)
+      {
+        analogWrite(vP,244);
+        v=true;
+        Serial.print("\nVribating\n");
+      }
+      else
+      {
+        analogWrite(vP,0);
+        v=false;
+        Serial.print("\nStopped Vibrating\n");
+      }
+    }
+    else if(inputString=="v"){
+      if(v==false)
+      {
+        analogWrite(vP,244);
+        v=true;
+      }
+      else
+      {
+        analogWrite(vP,0);
+        v=false;
+      }
+      Serial.print("\n\n");
+    }
+    else if(inputString!="")Serial.print("\n"+inputString+": command not found\n");
+    Serial.print("4d_chair@arduino-uno ~ $ ");
+    inputString="";
+  }
+}
+
+/*
+  SerialEvent occurs whenever a new data comes in the
+ hardware serial RX.  This routine is run between each
+ time loop() runs, so using delay inside loop can delay
+ response.  Multiple bytes of data may be available.
+ */
+void serialEvent() {
+  while (Serial.available()) {
+    // get the new byte:
+    char inChar = (char)Serial.read(); 
+    // add it to the inputString:
+    if (inChar != '\n'&&inChar != ';') inputString += inChar;
+    else stringComplete = true;
+    // if the incoming character is a newline or ;, set a flag
+    // so the main loop can do something about it: 
+  }
+}
