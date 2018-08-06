@@ -1,10 +1,29 @@
 #include <Servo.h>
+
+/*
+  Serial Event example
+ 
+ When new serial data arrives, this sketch adds it to a String.
+ When a newline is received, the loop prints the string and 
+ clears it.
+ 
+ A good test for this is to try it with a GPS receiver 
+ that sends out NMEA 0183 sentences. 
+ 
+ Created 9 May 2011
+ by Tom Igoe
+ 
+ This example code is in the public domain.
+ 
+ http://www.arduino.cc/en/Tutorial/SerialEvent
+ 
+ */
+
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 Servo fb;
 Servo rl;
 const int vP=3;
-bool v=false;
 void setup() {
   // initialize serial:
   Serial.begin(9600);
@@ -24,7 +43,6 @@ void loop() {
   if (stringComplete) { 
     stringComplete = false;
     if(inputString=="") Serial.print("\n");
-    Serial.print(inputString);
     if(inputString=="f"){
       fb.write(60);
       Serial.print("\nFront\n");
@@ -84,33 +102,20 @@ void loop() {
       fb.write(120);
       Serial.print("\nBack Right\n");
     }
-    else if (inputString=="v")
+    else if (inputString=="q")
     {
-      if(!v)
-      {
-        analogWrite(vP,244);
-        v=true;
-        Serial.print("\nVribating\n");
-      }
-      else
-      {
-        analogWrite(vP,0);
-        v=false;
-        Serial.print("\nStopped Vibrating\n");
-      }
+      Serial.print("\nQuitting\n");
+      Serial.end();
     }
-    else if(inputString=="v"){
-      if(v==false)
-      {
-        analogWrite(vP,244);
-        v=true;
-      }
-      else
-      {
-        analogWrite(vP,0);
-        v=false;
-      }
-      Serial.print("\n\n");
+    else if (inputString=="vb")
+    {
+      analogWrite(vP,244);
+      Serial.print("\nVribating\n");
+    }
+    else if (inputString=="ve")
+    {
+      analogWrite(vP,0);
+      Serial.print("\nStopped Vibrating\n");
     }
     else if(inputString!="")Serial.print("\n"+inputString+": command not found\n");
     Serial.print("4d_chair@arduino-uno ~ $ ");
